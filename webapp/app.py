@@ -2,6 +2,7 @@
 from flask import Flask
 from flask import flash
 from flask import json
+from flask import redirect
 from flask import render_template
 from flask import request
 from flask import session
@@ -25,17 +26,17 @@ FLASH_INFO = 'info'
 FLASH_WARNING = 'warning'
 FLASH_DANGER = 'danger'
 
-USER_ID_KEY = 'UserID'
+USER_ID_KEY = 'user_id'
 
 def logged_in():
   return USER_ID_KEY in session
 
 @app.route('/')
 def home():
-  #if logged_in():
-    #return render_template('home_loggedin.html', teacherID=session[TEACHER_ID_KEY])
-  #else:
-  return render_template('home.html')
+  if logged_in():
+    return render_template('home_loggedin.html')
+  else:
+    return render_template('home.html')
 
 @app.route('/register')
 def register():
@@ -86,64 +87,54 @@ def do_register():
   # Enter session
   session[USER_ID_KEY] = new_user_id
 
-  flash('Your account has been registered', FLASH_SUCCESS)
+  flash('Success! Your account has been registered.', FLASH_SUCCESS)
   return json.dumps({}), 200
 
-# @app.route('/do_sign_in', methods=['POST'])
-# def do_sign_in():
-#   username = request.form['inputName']
-#   password = request.form['inputPassword']
+@app.route('/do_sign_in', methods=['POST'])
+def do_sign_in():
+  username = request.form['inputName']
+  password = request.form['inputPassword']
 
-#   loggedInTeacherID = -1
+  logged_in_user_id = -1
 
-#   # Validate fields
-#   errors = {}
-#   if not username:
-#     errors['inputName'] = 'Please enter a username'
-#   if not password:
-#     errors['inputPassword'] = 'Please enter a password'
+  # Validate fields
+  errors = {}
+  if not username:
+    errors['inputName'] = 'Please enter a username'
+  if not password:
+    errors['inputPassword'] = 'Please enter a password'
 
-#   if username and password:
-#     cursor = mysql.connection.cursor()
-#     cursor.execute('''
-#       SELECT TeacherID, Password FROM Teacher WHERE Username = %s
-#     ''', (username,))
-#     result = cursor.fetchone()
+  if username and password:
+    cursor = mysql.connection.cursor()
+    cursor.execute('''
+      SELECT UserID, Password FROM User WHERE Username = %s
+    ''', (username,))
+    result = cursor.fetchone()
 
-#     if result is None:
-#       errors['inputName'] = 'No user found'
-#     else:
-#       stored_password = result[1].encode('utf8')
-#       if check_password_hash(stored_password, password):
-#         loggedInTeacherID = result[0]
-#       else:
-#         errors['inputPassword'] = 'Incorrect password'
+    if result is None:
+      errors['inputName'] = 'No user found'
+    else:
+      stored_password = result[1].encode('utf8')
+      if check_password_hash(stored_password, password):
+        logged_in_user_id = result[0]
+      else:
+        errors['inputPassword'] = 'Incorrect password'
 
-#   if errors:
-#     return json.dumps({'errors': errors})
+  if errors:
+    return json.dumps({'errors': errors})
 
-#   # Enter session
-#   session[TEACHER_ID_KEY] = loggedInTeacherID
+  # Enter session
+  session[USER_ID_KEY] = logged_in_user_id
 
-#   flash('You have successfully logged in', FLASH_SUCCESS)
-#   return json.dumps({}), 200
+  flash('You have successfully logged in', FLASH_SUCCESS)
+  return json.dumps({}), 200
 
-# @app.route('/do_logout')
-# def do_logout():
-#   session.pop(TEACHER_ID_KEY, None)
+@app.route('/do_logout')
+def do_logout():
+  session.pop(USER_ID_KEY, None)
 
-#   flash('You have been logged out', FLASH_SUCCESS)
-#   return redirect('/')
-
-# @app.route('/books')
-# def book_list():
-#   book_records = BookRecord.fetchAll(mysql)
-#   return render_template('books.html', book_records=book_records)
-
-# @app.route('/books/<int:book_identifier>/')
-# def book(book_identifier):
-#   book_record = BookRecord.fetchFromIdentifier(mysql, book_identifier)
-#   return render_template('book.html', book_record=book_record)
+  flash('You have been logged out', FLASH_SUCCESS)
+  return redirect('/')
 
 if __name__ == '__main__':
   # Secret key for development only. Not used in production.
