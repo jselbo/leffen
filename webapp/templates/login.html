@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block css %}
+  {{ super() }}
+  <link href="static/css/register.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+  <div class="jumbotron">
+    <h1 class="text-center">Log In</h1>
+    <form class="form-signin" id="signInForm">
+      <div class="form-group">
+        <label for="inputName" class="sr-only">Username</label>
+        <input type="name" name="inputName" id="inputName" class="form-control" placeholder="Username" required autofocus>
+        <span class="help-block"></span>
+      </div>
+      <div class="form-group">
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" name="inputPassword" id="inputPassword" class="form-control" placeholder="Password" required>
+        <span class="help-block"></span>
+      </div>
+       
+      <button id="btnSignIn" class="btn btn-lg btn-primary btn-block" type="button">Sign In</button>
+    </form>
+    <div class="alert alert-danger" role="alert" id="failureAlert" style="display: none;">
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script>
+    $(function() {
+      $('#btnSignIn').click(function() {
+        var signInButton = $(this);
+        signInButton.attr('disabled', 'disabled')
+        $.ajax({
+          url: '/do_sign_in',
+          data: $('form').serialize(),
+          type: 'POST',
+          success: function(response) {
+            response = $.parseJSON(response)
+            if ('errors' in response) {
+              errors = response['errors'];
+              $('#signInForm').children('.form-group').each(function() {
+                inputID = $(this).children('input').attr('id');
+                if (inputID in errors) {
+                  $(this).addClass('has-error');
+                  $(this).children('.help-block').text(errors[inputID]);
+                } else {
+                  $(this).removeClass('has-error');
+                  $(this).children('.help-block').text('');
+                }
+                signInButton.removeAttr('disabled');
+              });
+            } else {
+              window.location.href = '/';
+            }
+          },
+          error: function(error) {
+            $('#failureAlert')
+              .css('display', '')
+              .text('Sorry, we\'re having trouble logging you in at this time.')
+            signInButton.removeAttr('disabled');
+          }
+        });
+      });
+    });
+  </script>
+
+{% endblock %}
