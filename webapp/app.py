@@ -1,6 +1,9 @@
 
 from flask import Flask
+from flask import flash
+from flask import json
 from flask import render_template
+from flask import request
 from flask import session
 
 from flask_mysqldb import MySQL
@@ -10,20 +13,22 @@ from werkzeug.security import check_password_hash
 
 app = Flask(__name__)
 
-# app.config['MYSQL_USER'] = 'checkin'
-# app.config['MYSQL_PASSWORD'] = 'checkinpass'
-# app.config['MYSQL_DB'] = 'checkin'
-# app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'leffen'
+app.config['MYSQL_PASSWORD'] = 'leffenpass'
+app.config['MYSQL_DB'] = 'leffen'
+app.config['MYSQL_HOST'] = 'localhost'
 
-# mysql = MySQL(app)
+mysql = MySQL(app)
 
 FLASH_SUCCESS = 'success'
 FLASH_INFO = 'info'
 FLASH_WARNING = 'warning'
 FLASH_DANGER = 'danger'
 
-# def logged_in():
-#   return TEACHER_ID_KEY in session
+USER_ID_KEY = 'UserID'
+
+def logged_in():
+  return USER_ID_KEY in session
 
 @app.route('/')
 def home():
@@ -40,55 +45,49 @@ def register():
 def login():
   return render_template('login.html')
 
-# @app.route('/checkin')
-# def checkin():
-#   return render_template('checkin.html')
+@app.route('/do_register', methods=['POST'])
+def do_register():
+  username = request.form['inputName']
+  password = request.form['inputPassword']
+  email = request.form['inputEmail']
 
-# @app.route('/do_register', methods=['POST'])
-# def do_sign_up():
-#   username = request.form['inputName']
-#   password = request.form['inputPassword']
-#   title = request.form['inputTitle']
-#   lastName = request.form['inputLastName']
-#   email = request.form['inputEmail']
+  # Validate fields
+  errors = {}
+  if not username:
+    errors['inputName'] = 'Please enter a username'
+  else:
+    cursor = mysql.connection.cursor()
+    cursor.execute('''
+      SELECT COUNT(*) FROM User WHERE Username = %s
+    ''', (username,))
+    if cursor.fetchone()[0] > 0:
+      errors['inputName'] = 'This username already exists; please choose another username'
+  if not password:
+    errors['inputPassword'] = 'Please enter a password'
+  if not email:
+    errors['inputEmail'] = 'Please enter an email'
 
-#   # Validate fields
-#   errors = {}
-#   if not username:
-#     errors['inputName'] = 'Please enter a username'
-#   else:
-#     cursor = mysql.connection.cursor()
-#     cursor.execute('''
-#       SELECT COUNT(*) FROM Teacher WHERE Username = %s
-#     ''', (username,))
-#     if cursor.fetchone()[0] > 0:
-#       errors['inputName'] = 'This username already exists; please choose another username'
-#   if not password:
-#     errors['inputPassword'] = 'Please enter a password'
-#   if not lastName:
-#     errors['inputLastName'] = 'Please enter your last name'
+  if errors:
+    return json.dumps({'errors': errors})
 
-#   if errors:
-#     return json.dumps({'errors': errors})
+  # Hash, salt password
+  password = generate_password_hash(password)
 
-#   # Hash, salt password
-#   password = generate_password_hash(password)
+  # Insert account
+  register_stmt = '''
+    INSERT INTO User (Username, Password, Email)
+    VALUES (%s, %s, %s)
+  '''
+  register_data = (username, password, email)
+  cursor.execute(register_stmt, register_data)
+  new_user_id = cursor.lastrowid
+  mysql.connection.commit()
 
-#   # Insert account
-#   register_stmt = '''
-#     INSERT INTO Teacher (Username, Password, Email, Title, LastName)
-#     VALUES (%s, %s, %s, %s, %s)
-#   '''
-#   register_data = (username, password, email, title, lastName)
-#   cursor.execute(register_stmt, register_data)
-#   newTeacherID = cursor.lastrowid
-#   mysql.connection.commit()
+  # Enter session
+  session[USER_ID_KEY] = new_user_id
 
-#   # Enter session
-#   session[TEACHER_ID_KEY] = newTeacherID
-
-#   flash('Your account has been registered', FLASH_SUCCESS)
-#   return json.dumps({}), 200
+  flash('Your account has been registered', FLASH_SUCCESS)
+  return json.dumps({}), 200
 
 # @app.route('/do_sign_in', methods=['POST'])
 # def do_sign_in():
