@@ -16,6 +16,58 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `Group`
+--
+
+DROP TABLE IF EXISTS `Group`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Group` (
+  `GroupID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Name` varchar(128) NOT NULL,
+  `Code` char(16) NOT NULL,
+  `Created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`GroupID`),
+  UNIQUE KEY `Code` (`Code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `GroupMembership`
+--
+
+DROP TABLE IF EXISTS `GroupMembership`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `GroupMembership` (
+  `UserID` bigint(20) NOT NULL,
+  `GroupID` bigint(20) NOT NULL,
+  `PrivilegeID` bigint(20) NOT NULL,
+  `Created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`UserID`,`GroupID`),
+  KEY `GroupID` (`GroupID`),
+  KEY `PrivilegeID` (`PrivilegeID`),
+  CONSTRAINT `GroupMembership_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`),
+  CONSTRAINT `GroupMembership_ibfk_2` FOREIGN KEY (`GroupID`) REFERENCES `Group` (`GroupID`),
+  CONSTRAINT `GroupMembership_ibfk_3` FOREIGN KEY (`PrivilegeID`) REFERENCES `Privilege` (`PrivilegeID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `Privilege`
+--
+
+DROP TABLE IF EXISTS `Privilege`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Privilege` (
+  `PrivilegeID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `Name` varchar(128) NOT NULL,
+  PRIMARY KEY (`PrivilegeID`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `User`
 --
 
@@ -28,8 +80,31 @@ CREATE TABLE `User` (
   `Password` char(80) NOT NULL,
   `Email` varchar(256) NOT NULL,
   `Verified` tinyint(1) DEFAULT '0',
-  PRIMARY KEY (`UserID`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+  `SecretCode` char(16) NOT NULL,
+  `Created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`UserID`),
+  UNIQUE KEY `SecretCode` (`SecretCode`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `VideoUpload`
+--
+
+DROP TABLE IF EXISTS `VideoUpload`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `VideoUpload` (
+  `UploadID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `GroupID` bigint(20) NOT NULL,
+  `Title` varchar(128) DEFAULT NULL,
+  `Description` varchar(1024) DEFAULT NULL,
+  `YouTubeURL` char(128) NOT NULL,
+  `Created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`UploadID`),
+  KEY `GroupID` (`GroupID`),
+  CONSTRAINT `VideoUpload_ibfk_1` FOREIGN KEY (`GroupID`) REFERENCES `Group` (`GroupID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -41,4 +116,4 @@ CREATE TABLE `User` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-01-12  3:29:15
+-- Dump completed on 2017-01-17  3:38:00
