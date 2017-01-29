@@ -2,7 +2,7 @@
   "name": "messenger",
   "version": "1.0.0",
   "description": "MY-EFN",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/jselbo/leffen#readme",
   "dependencies": {
-    "discord.js": "^11.0.0"
+    "body-parser": "^1.16.0",
+    "discord.js": "^11.0.0",
+    "express": "^4.14.1"
   }
 }

@@ -1,34 +1,25 @@
-/*
-  A ping pong bot, whenever you send "ping", it replies "pong".
-*/
+var discordBot = require('./DiscordBot.js');
 
-// import the discord.js module
-const Discord = require('discord.js');
+var express = require('express');
+var app = express();
+var bodyParser = require('body-parser');
+var jsonParser = bodyParser.json();
 
-// create an instance of a Discord Client, and call it bot
-const bot = new Discord.Client();
+// import * from './DiscordBot.js'; //es6 syntax
 
-// the token of your bot - https://discordapp.com/developers/applications/me
-const token = 'Mjc1MzIxODExNDM0OTk1NzEz.C2_GYA.uVoSelPmgPc_tI4zK0ScmYexa0w';
-
-// the ready event is vital, it means that your bot will only start reacting to information
-// from Discord _after_ ready is emitted.
-bot.on('ready', () => {
-  console.log('I am ready!');
+app.get('/', (req, res) => {
+  res.send('Hello World!');
 });
 
-// // create an event listener for messages
-bot.on('message', message => {
-  // if the message is "ping",
-  if (message.content === 'ping') {
-    // send "pong" to the same channel.
-    message.channel.sendMessage('pong');
-  }
+app.post('/', jsonParser, (req, res) => {
+    const url = req.body.URL;
+    const videoId = req.body.VideoID;
+    const title = req.body.Title;
+    discordBot.sendMessage(url, videoId, title);
+    res.send('Discord Bot Message Sent!');
+
 });
 
-// log our bot in
-bot.login(token).then((success) => {
-  console.log('Login Successful');
-}, (failure) => {
-  console.log('Failed to log in');
+app.listen(3000, () =>  {
+  console.log('Running...')
 });
