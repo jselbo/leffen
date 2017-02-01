@@ -6,9 +6,8 @@ const hook = new Discord.WebhookClient('275384669137272832', '1lk5fTweeRNRdJBdRO
 //videoid and timestamps
 
 module.exports = {
-	//TODO: URL Clickable
 	sendMessage: function(url, videoId, title) {
-		const msg = 'Video URL: ' + 'https://' + url + ' Title: ' + title;
-		hook.sendMessage(msgEmbed);
+		const msg = 'Video URL: https://' + url + ' Title: ' + title;
+		hook.sendMessage(msg);
 	}
 }
