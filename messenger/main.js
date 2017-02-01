@@ -5,10 +5,8 @@ var app = express();
 var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json();
 
-// import * from './DiscordBot.js'; //es6 syntax
-
 app.get('/', (req, res) => {
-  res.send('Hello World!');
+  res.send('Timestamp lyfe');
 });
 
 app.post('/', jsonParser, (req, res) => {
@@ -17,7 +15,6 @@ app.post('/', jsonParser, (req, res) => {
     const title = req.body.Title;
     discordBot.sendMessage(url, videoId, title);
     res.send('Discord Bot Message Sent!');
-
 });
 
 app.listen(3000, () =>  {
