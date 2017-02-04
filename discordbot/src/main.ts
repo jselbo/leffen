@@ -1,8 +1,8 @@
-var discordBot = require('./DiscordBot.js');
-
-var express = require('express');
-var app = express();
 var bodyParser = require('body-parser');
+var discordBot = require('./DiscordBot.js');
+var express = require('express');
+
+var app = express();
 var jsonParser = bodyParser.json();
 
 app.get('/', (req, res) => {
