@@ -19,8 +19,8 @@ Description coming soon
 
 ### Development
 
-1) [Install Node.js](https://nodejs.org/en/download/)
-2) Install TypeScript: `npm install -g typescript`
-3) In the root of the Discord Bot, run `npm install` to install project modules
-4) Run `tsc` to compile TypeScript source files
-5) Run `node build/main.js` to start the bot
+1. [Install Node.js](https://nodejs.org/en/download/)
+2. Install TypeScript: `npm install -g typescript`
+3. In the root of the Discord Bot, run `npm install` to install project modules
+4. Run `tsc` to compile TypeScript source files
+5. Run `node build/main.js` to start the bot
