@@ -1,0 +1,27 @@
+{
+  "name": "messenger",
+  "version": "1.0.0",
+  "description": "MY-EFN",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jselbo/leffen.git"
+  },
+  "keywords": [
+    "Melee"
+  ],
+  "author": "Don Phan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jselbo/leffen/issues"
+  },
+  "homepage": "https://github.com/jselbo/leffen#readme",
+  "dependencies": {
+    "body-parser": "^1.16.0",
+    "discord.js": "^11.0.0",
+    "express": "^4.14.1"
+  }
+}
