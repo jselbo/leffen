@@ -1,8 +1,15 @@
 import * as bodyParser from 'body-parser';
-import * as express    from 'express';
-import * as discordBot from './DiscordBot';
+import * as express from 'express';
+import DiscordBot from './DiscordBot';
+
+import * as http from 'http';
+
+const port = 3000
+
 const app = express();
 const jsonParser = bodyParser.json();
+const discordBot = new DiscordBot.Bot();
+discordBot.listen();
 
 app.get('/', (req, res) => {
   res.send('Timestamp lyfe');
@@ -13,13 +20,13 @@ app.post('/', jsonParser, (req, res) => {
   const videoId = req.body.VideoID;
   const title = req.body.Title;
 
-  let discordObj = new discordBot.discordRequest(url, videoId, title); 
-  discordObj.sendVideoPing();
+  const discordRequest = new DiscordBot.Request(url, videoId, title);
+  discordRequest.sendVideoPing();
 
   res.send('Discord Bot Message Sent!');
 });
 
-app.listen(3000, () =>  {
+app.listen(port, () =>  {
   console.log('Running...');
 });
 
